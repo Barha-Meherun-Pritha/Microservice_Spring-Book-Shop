@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -27,36 +29,47 @@ public class PaymentController {
     UserFeignClientsConfig userFeignClientsConfig;
 
     @GetMapping("pay/{id}-{userId}-{type}")
-    public String getPayment(@PathVariable String id, @PathVariable String userId, @PathVariable String type){
+    public Map<String, String> getPayment(@PathVariable String id, @PathVariable String userId, @PathVariable String type){
+        HashMap<String, String> map = new HashMap<>();
         PaymentEntity payment = paymentService.getPaymentById(Long.parseLong(id));
         if(payment==null){
             logger.info("No payment found with this ID!");
-            return "No payment found with this ID!";
+            map.put("Error", "No payment found with this ID!");
+            return map;
         }
         else {
             Boolean done = payment.getPaymentDone();
             if(done){
                 logger.info("Payment is complete with this payment ID!");
-                return "Payment is complete with this payment ID!";
+                map.put("Error", "Payment is complete with this payment ID!");
+                return map;
             }
             else {
                 Long total = orderFeignClientsConfig.getPayment(id);
                 if (total == 0L) {
                     logger.info("No order made with this payment ID!");
-                    return "No order made with this payment ID!";
+                    map.put("Error", "No order made with this payment ID!");
+                    return map;
                 } else {
                     Long balance = userFeignClientsConfig.balance(userId, String.valueOf(total));
                     if (balance == null) {
                         logger.info("No user found with this ID!");
-                        return "No user found with this ID!";
+                        map.put("Error", "No user found with this ID!");
+                        return map;
                     } else {
                         if (balance < total) {
                             logger.info("Insufficient balance of user!");
-                            return "Insufficient balance of user!";
+                            map.put("Error", "Insufficient balance of user!");
+                            return map;
                         } else {
                             paymentService.newPayment(id, total, type);
                             logger.info("Payment ID: " + id + ", Total Payment: " + total + ", Payment Type: " + type + ", User new balance: " + balance + ", Payment status: Complete");
-                            return "Payment ID: " + id + ", Total Payment: " + total + ", Payment Type: " + type + ", User new balance: " + balance + ", Payment status: Complete";
+                            map.put("Payment ID", id);
+                            map.put("Total Payment", String.valueOf(total));
+                            map.put("Payment Type", type);
+                            map.put("User new balance", String.valueOf(balance));
+                            map.put("Order payment status", "Complete");
+                            return map;
                         }
                     }
                 }

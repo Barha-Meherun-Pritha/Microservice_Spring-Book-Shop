@@ -3,11 +3,14 @@ package com.bjit.OrderApp.config;
 import com.bjit.OrderApp.entity.OrderEntity;
 import com.bjit.OrderApp.model.OrderRequestModel;
 import com.bjit.OrderApp.service.OrderService;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
@@ -52,30 +55,40 @@ public class OrderController {
         }
     }
 
-    @GetMapping("inventory/{payment}-{id}-{quantity}")
-    public String inventory(@PathVariable String payment, @PathVariable String id, @PathVariable String quantity){
+    @GetMapping("item/{payment}-{id}-{quantity}")
+    public Map<String, String> inventory(@PathVariable String payment, @PathVariable String id, @PathVariable String quantity){
+        HashMap<String, String> map = new HashMap<>();
         String pay = paymentFeignClientsConfig.getPaymentById(payment);
         if(!Objects.equals(pay, "Found")){
             logger.info("No payment found!");
-            return "No payment found!";
+            map.put("Error", "No payment found!");
+            return map;
         }
         else {
             String name = bookFeignClientsConfig.name(id);
             if (Objects.equals(name, "No book found with this ID!")) {
                 logger.info("No book found!");
-                return "No book found!";
+                map.put("Error", "No book found!");
+                return map;
             } else {
                 Long stock = bookFeignClientsConfig.inventory(id, quantity);
                 if (stock < Long.parseLong(quantity)) {
                     logger.info("Not enough book in the inventory!");
-                    return "Not enough book in the inventory!";
+                    map.put("Error", "Not enough book in the inventory!");
+                    return map;
                 } else {
                     Long price = bookFeignClientsConfig.price(id);
                     long total = price * Long.parseLong(quantity);
                     Object order = orderService.newOrder(payment, id, quantity, price);
-                    String msg = "Book Id: " + id + ", Name: " + name + ", Inventory: " + stock + ", Price: " + price + ", Quantity: " + quantity + ", Total: " + total;
+                    String msg = "Book IS: " + id + ", Name: " + name + ", Inventory: " + stock + ", Price: " + price + ", Quantity: " + quantity + ", Total: " + total;
                     logger.info(msg);
-                    return msg;
+                    map.put("Book ID", id);
+                    map.put("Book Name", name);
+                    map.put("Book Inventory", String.valueOf(stock));
+                    map.put("Book Price", String.valueOf(price));
+                    map.put("Book Quantity", quantity);
+                    map.put("Total Price", String.valueOf(total));
+                    return map;
                 }
             }
         }
