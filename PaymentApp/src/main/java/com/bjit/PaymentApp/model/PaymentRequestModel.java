@@ -13,6 +13,7 @@ public class PaymentRequestModel {
 
     private Long total;
     private String paymentType;
+    private Boolean paymentDone;
 
 }
 

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
 import java.util.logging.Logger;
 
 @RestController
@@ -20,19 +21,35 @@ public class PaymentController {
     Logger logger = Logger.getLogger("PaymentController");
 
     @Autowired
-    FeignClientsConfig feignClientsConfig;
+    OrderFeignClientsConfig orderFeignClientsConfig;
 
-    @GetMapping("pay/{id}-{type}")
-    public String getPayment(@PathVariable String id, @PathVariable String type){
-        Long total = feignClientsConfig.getPayment(id);
+    @Autowired
+    UserFeignClientsConfig userFeignClientsConfig;
+
+    @GetMapping("pay/{id}-{userId}-{type}")
+    public String getPayment(@PathVariable String id, @PathVariable String userId, @PathVariable String type){
+        Long total = orderFeignClientsConfig.getPayment(id);
         if(total==0L) {
             logger.info("No payment found with this ID!");
             return "No payment found with this ID!";
         }
         else {
-            paymentService.newPayment(id, total, type);
-            logger.info("Payment ID: " + id + ", Total Payment: " + total + ", Payment Type: " + type);
-            return "Payment ID: " + id + ", Total Payment: " + total + ", Payment Type: " + type;
+            Long balance = userFeignClientsConfig.balance(userId, String.valueOf(total));
+            if (balance==null) {
+                logger.info("No user found with this ID!");
+                return "No user found with this ID!";
+            }
+            else {
+                if (balance < total) {
+                    logger.info("Insufficient balance of user!");
+                    return "Insufficient balance of user!";
+                } else {
+                    paymentService.newPayment(id, total, type);
+                    logger.info("Payment ID: " + id + ", Total Payment: " + total + ", Payment Type: " + type + ", User new balance: " + balance + ", Payment status: Complete");
+                    return "Payment ID: " + id + ", Total Payment: " + total + ", Payment Type: " + type + ", User new balance: " + balance + ", Payment status: Complete";
+                }
+            }
+
         }
     }
 

@@ -32,6 +32,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .paymentId(Payment.get().getPaymentId())
                     .total(Payment.get().getTotal())
                     .paymentType(Payment.get().getPaymentType())
+                    .paymentDone(Payment.get().getPaymentDone())
                     .build();
             return new ResponseEntity<>(paymentEntity, HttpStatus.FOUND);
         }
@@ -60,6 +61,7 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentEntity Payment = PaymentEntity.builder()
                 .paymentType(requestModel.getPaymentType())
                 .total(requestModel.getTotal())
+                .paymentDone(requestModel.getPaymentDone())
                 .build();
 
         PaymentEntity savedPayment = paymentRepository.save(Payment);
@@ -73,13 +75,15 @@ public class PaymentServiceImpl implements PaymentService {
         Optional<PaymentEntity> payment = paymentRepository.findById(Long.parseLong(id));
         if (payment.isEmpty()){
             savedPayment = PaymentEntity.builder()
-                .paymentType(type)
-                .total(total)
-                .build();
+                    .paymentType(type)
+                    .total(total)
+                    .paymentDone(true)
+                    .build();
         }
         else {
             payment.get().setPaymentType(type);
             payment.get().setTotal(total);
+            payment.get().setPaymentDone(true);
             savedPayment = paymentRepository.save(payment.get());
         }
         return paymentRepository.save(savedPayment);
@@ -94,6 +98,7 @@ public class PaymentServiceImpl implements PaymentService {
         else {
             payment.get().setPaymentType(requestModel.getPaymentType());
             payment.get().setTotal(requestModel.getTotal());
+            payment.get().setPaymentDone(requestModel.getPaymentDone());
 
             PaymentEntity savedPayment = paymentRepository.save(payment.get());
 

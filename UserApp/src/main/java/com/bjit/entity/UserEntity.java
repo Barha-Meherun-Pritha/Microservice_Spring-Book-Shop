@@ -1,4 +1,4 @@
-package com.bjit.PaymentApp.entity;
+package com.bjit.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -8,18 +8,19 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "payment")
+@Table(name = "customer")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PaymentEntity {
+public class UserEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long paymentId;
-    private Long total;
-    private String paymentType;
-    private Boolean paymentDone;
+    private Long customerId;
+    private String username;
+    private String email;
+    @Column(nullable = true)
+    private Long balance;
 
 }
