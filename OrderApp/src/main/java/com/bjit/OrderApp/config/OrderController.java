@@ -59,9 +59,14 @@ public class OrderController {
     public Map<String, String> inventory(@PathVariable String payment, @PathVariable String id, @PathVariable String quantity){
         HashMap<String, String> map = new HashMap<>();
         String pay = paymentFeignClientsConfig.getPaymentById(payment);
-        if(!Objects.equals(pay, "Found")){
+        if(Objects.equals(pay, "No payment found!")){
             logger.info("No payment found!");
             map.put("Error", "No payment found!");
+            return map;
+        }
+        else if(Objects.equals(pay, "Payment complete!")){
+            logger.info("Payment is already complete!");
+            map.put("Error", "Payment is already complete!");
             return map;
         }
         else {

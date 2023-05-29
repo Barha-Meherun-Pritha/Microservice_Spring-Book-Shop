@@ -57,7 +57,7 @@ public class PaymentController {
                         map.put("Error", "No user found with this ID!");
                         return map;
                     } else {
-                        if (balance < total) {
+                        if(balance < total) {
                             logger.info("Insufficient balance of user!");
                             map.put("Error", "Insufficient balance of user!");
                             return map;
@@ -89,9 +89,13 @@ public class PaymentController {
             logger.info("No payment found!");
             return "No payment found!";
         }
+        else if(payment.getPaymentDone()){
+            logger.info("Payment complete!");
+            return "Payment complete!";
+        }
         else {
-            logger.info("Found");
-            return "Found";
+            logger.info("Found!");
+            return "Found!";
         }
     }
 
