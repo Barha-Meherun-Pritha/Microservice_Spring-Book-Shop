@@ -11,9 +11,9 @@ import lombok.NoArgsConstructor;
 @Builder
 public class PaymentRequestModel {
 
-    private Long total;
-    private String paymentType;
-    private Boolean paymentDone;
+    private Long total = 0L;
+    private String paymentType = "cash";
+    private Boolean paymentDone = false;
 
 }
 

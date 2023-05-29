@@ -8,7 +8,8 @@ This project demonstrates the implementation of microservice using Spring Boot, 
 * User registration.
 * See all books.
 * Book order with quantity.
-* Order payment.
+* Order books.
+* User payment.
 
 
 ## Technologies
@@ -33,6 +34,7 @@ To build and run the project, follow these steps:
 
 * Login to mySQL driver with user "root" and password "root"
 * Add database "project_db" to mySQL
+* Set the path of configRepo in application.properties in configServer
 * Run the project
 
 The application will run at http://localhost:9090

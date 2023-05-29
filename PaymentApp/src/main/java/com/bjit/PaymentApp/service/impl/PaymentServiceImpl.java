@@ -39,6 +39,24 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    public PaymentEntity getPaymentById(Long id) {
+        Optional<PaymentEntity> Payment;
+        Payment = paymentRepository.findById(id);
+        if (Payment.isEmpty()){
+            return null;
+        }
+        else {
+            PaymentEntity paymentEntity = PaymentEntity.builder()
+                    .paymentId(Payment.get().getPaymentId())
+                    .total(Payment.get().getTotal())
+                    .paymentType(Payment.get().getPaymentType())
+                    .paymentDone(Payment.get().getPaymentDone())
+                    .build();
+            return paymentEntity;
+        }
+    }
+
+    @Override
     public ResponseEntity<Iterable<PaymentEntity>> getPaymentByPaymentType(String type) {
         Iterable<PaymentEntity> payments = paymentRepository.findAll();
         List<PaymentEntity> b = new ArrayList<PaymentEntity>();

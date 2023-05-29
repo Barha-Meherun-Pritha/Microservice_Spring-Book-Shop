@@ -18,8 +18,8 @@ public class PaymentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long paymentId;
-    private Long total;
-    private String paymentType;
-    private Boolean paymentDone;
+    private Long total = 0L;
+    private String paymentType = "cash";
+    private Boolean paymentDone = false;
 
 }

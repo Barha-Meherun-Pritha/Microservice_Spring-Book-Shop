@@ -28,28 +28,39 @@ public class PaymentController {
 
     @GetMapping("pay/{id}-{userId}-{type}")
     public String getPayment(@PathVariable String id, @PathVariable String userId, @PathVariable String type){
-        Long total = orderFeignClientsConfig.getPayment(id);
-        if(total==0L) {
+        PaymentEntity payment = paymentService.getPaymentById(Long.parseLong(id));
+        if(payment==null){
             logger.info("No payment found with this ID!");
             return "No payment found with this ID!";
         }
         else {
-            Long balance = userFeignClientsConfig.balance(userId, String.valueOf(total));
-            if (balance==null) {
-                logger.info("No user found with this ID!");
-                return "No user found with this ID!";
+            Boolean done = payment.getPaymentDone();
+            if(done){
+                logger.info("Payment is complete with this payment ID!");
+                return "Payment is complete with this payment ID!";
             }
             else {
-                if (balance < total) {
-                    logger.info("Insufficient balance of user!");
-                    return "Insufficient balance of user!";
+                Long total = orderFeignClientsConfig.getPayment(id);
+                if (total == 0L) {
+                    logger.info("No order made with this payment ID!");
+                    return "No order made with this payment ID!";
                 } else {
-                    paymentService.newPayment(id, total, type);
-                    logger.info("Payment ID: " + id + ", Total Payment: " + total + ", Payment Type: " + type + ", User new balance: " + balance + ", Payment status: Complete");
-                    return "Payment ID: " + id + ", Total Payment: " + total + ", Payment Type: " + type + ", User new balance: " + balance + ", Payment status: Complete";
+                    Long balance = userFeignClientsConfig.balance(userId, String.valueOf(total));
+                    if (balance == null) {
+                        logger.info("No user found with this ID!");
+                        return "No user found with this ID!";
+                    } else {
+                        if (balance < total) {
+                            logger.info("Insufficient balance of user!");
+                            return "Insufficient balance of user!";
+                        } else {
+                            paymentService.newPayment(id, total, type);
+                            logger.info("Payment ID: " + id + ", Total Payment: " + total + ", Payment Type: " + type + ", User new balance: " + balance + ", Payment status: Complete");
+                            return "Payment ID: " + id + ", Total Payment: " + total + ", Payment Type: " + type + ", User new balance: " + balance + ", Payment status: Complete";
+                        }
+                    }
                 }
             }
-
         }
     }
 

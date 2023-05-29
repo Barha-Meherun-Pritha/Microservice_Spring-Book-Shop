@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 public interface PaymentService {
 
     ResponseEntity<Object> getPayment(Long id);
+    PaymentEntity getPaymentById(Long id);
     ResponseEntity<Iterable<PaymentEntity>> getPaymentByPaymentType(String type);
     ResponseEntity<Iterable<PaymentEntity>> getAllPayments();
     ResponseEntity<Object> createPayment(PaymentRequestModel requestModel);
