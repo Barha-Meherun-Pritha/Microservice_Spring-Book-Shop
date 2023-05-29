@@ -28,32 +28,30 @@ public class BookController {
         return price;
     }
 
-    @GetMapping("inventory/{bookId}")
-    public Long inventory(@PathVariable String bookId) {
+    @GetMapping("name/{bookId}")
+    public String name(@PathVariable String bookId) {
         BookEntity book = bookService.getBookById(Long.parseLong(bookId));
-        Long stock = book.getInventory();
-        stock = stock - 1;
-        book.setInventory(stock);
-        BookEntity savedBook = bookRepository.save(book);
-        logger.info("Book title: " + book.getTitle() + ", Inventory: " + stock);
-        return stock;
+        if(book==null){
+            logger.info("No book found with this ID!");
+            return "No book found with this ID!";
+        }
+        else {
+            String name = book.getTitle();
+            logger.info("Book title: " + book.getTitle() + ", Price: " + book.getPrice());
+            return name;
+        }
     }
 
-    @GetMapping("/getPrice")
-    public Long getPrice(String bookId) {
-        BookEntity book = bookService.getBookById(Long.parseLong(bookId));
-        Long price = book.getPrice();
-        logger.info("Book title: " + book.getTitle() + ", Price: " + price);
-        return price;
-    }
-
-    @GetMapping("/getInventory")
-    public Long getInventory(String bookId) {
+    @GetMapping("inventory/{bookId}-{quantity}")
+    public Long inventory(@PathVariable String bookId, @PathVariable String quantity) {
         BookEntity book = bookService.getBookById(Long.parseLong(bookId));
         Long stock = book.getInventory();
-        stock = stock - 1;
-        book.setInventory(stock);
-        BookEntity savedBook = bookRepository.save(book);
+        Long quant = Long.parseLong(quantity);
+        if(stock>=quant) {
+            stock = stock - quant;
+            book.setInventory(stock);
+            BookEntity savedBook = bookRepository.save(book);
+        }
         logger.info("Book title: " + book.getTitle() + ", Inventory: " + stock);
         return stock;
     }

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Objects;
 import java.util.logging.Logger;
 
 @RestController
@@ -22,36 +23,69 @@ public class OrderController {
     @Autowired
     BookFeignClientsConfig bookFeignClientsConfig;
 
-    @Autowired
-    PaymentFeignClientsConfig paymentFeignClientsConfig;
-
     @GetMapping("price/{id}")
     public String price(@PathVariable String id){
         Long price = bookFeignClientsConfig.price(id);
-        logger.info("Book Id: " + id + ", Price: " + price);
-        return "Book Id: " + id + ", Price: " + price;
+        if(price==null){
+            logger.info("No book found!");
+            return "No book found!";
+        }
+        else {
+            logger.info("Book Id: " + id + ", Price: " + price);
+            return "Book Id: " + id + ", Price: " + price;
+        }
     }
 
-    @GetMapping("inventory/{id}")
-    public String inventory(@PathVariable String id){
-        Long stock = bookFeignClientsConfig.inventory(id);
-        logger.info("Book Id: " + id + ", Inventory: " + stock);
-        return "Book Id: " + id + ", Inventory: " + stock;
+    @GetMapping("name/{id}")
+    public String name(@PathVariable String id){
+        String name = bookFeignClientsConfig.name(id);
+        if(Objects.equals(name, "No book found with this ID!")){
+            logger.info("No book found!");
+            return "No book found!";
+        }
+        else {
+            logger.info("Book Id: " + id + ", Name: " + name);
+            return "Book Id: " + id + ", Name: " + name;
+        }
     }
 
-    @GetMapping("getPrice/{id}")
-    public String getPrice(@PathVariable String id){
-        Long price = bookFeignClientsConfig.getPrice(id);
-        logger.info("Book Id: " + id + ", Price: " + price);
-        return "Book Id: " + id + ", Price: " + price;
+    @GetMapping("inventory/{payment}-{id}-{quantity}")
+    public String inventory(@PathVariable String payment, @PathVariable String id, @PathVariable String quantity){
+        String name = bookFeignClientsConfig.name(id);
+        if(Objects.equals(name, "No book found with this ID!")){
+            logger.info("No book found!");
+            return "No book found!";
+        }
+        else {
+            Long stock = bookFeignClientsConfig.inventory(id, quantity);
+            if(stock<Long.parseLong(quantity)) {
+                logger.info("Not enough book in the inventory!");
+                return "Not enough book in the inventory!";
+            }
+            else{
+                Long price = bookFeignClientsConfig.price(id);
+                long total = price * Long.parseLong(quantity);
+                Object order = orderService.newOrder(payment, id, quantity, price);
+                String msg = "Book Id: " + id + ", Name: " + name + ", Inventory: " + stock + ", Price: " + price + ", Quantity: " + quantity + ", Total: " + total;
+                logger.info(msg);
+                return msg;
+            }
+        }
     }
 
-    @GetMapping("getInventory/{id}")
-    public String getInventory(@PathVariable String id){
-        Long stock = bookFeignClientsConfig.getInventory(id);
-        logger.info("Book Id: " + id + ", Inventory: " + stock);
-        return "Book Id: " + id + ", Inventory: " + stock;
+    @GetMapping("/pay/{payment}")
+    public Long getPayment(@PathVariable String payment) {
+        Long total = orderService.getPayment(Long.parseLong(payment));
+        if(total==null) {
+            logger.info("No payment found with this ID!");
+            return 0L;
+        }
+        else {
+            logger.info("Payment ID: " + payment + ", Total: " + total);
+            return total;
+        }
     }
+
 
     @GetMapping("/id/{OrderId}")
     public ResponseEntity<Object> getOrder(@PathVariable String OrderId) {
@@ -59,7 +93,7 @@ public class OrderController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<Object> newOrder(@RequestBody OrderRequestModel Order) {
+    public ResponseEntity<Object> createOrder(@RequestBody OrderRequestModel Order) {
         return orderService.createOrder(Order);
     }
 

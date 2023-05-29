@@ -8,16 +8,14 @@ import org.springframework.web.bind.annotation.PathVariable;
 @FeignClient("book-app")
 public interface BookFeignClientsConfig {
 
-    @GetMapping("price/{bookId}")
+    @GetMapping("books/price/{bookId}")
     public Long price(@PathVariable String bookId);
 
-    @GetMapping("inventory/{bookId}")
-    public Long inventory(@PathVariable String bookId);
+    @GetMapping("books/name/{bookId}")
+    public String name(@PathVariable String bookId);
 
-    @GetMapping("getPrice")
-    public Long getPrice(String bookId);
+    @GetMapping("books/inventory/{bookId}-{quantity}")
+    public Long inventory(@PathVariable String bookId, @PathVariable String quantity);
 
-    @GetMapping("/getInventory")
-    public Long getInventory(String bookId);
 
 }

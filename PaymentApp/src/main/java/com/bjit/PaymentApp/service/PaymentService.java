@@ -12,6 +12,7 @@ public interface PaymentService {
     ResponseEntity<Iterable<PaymentEntity>> getPaymentByPaymentType(String type);
     ResponseEntity<Iterable<PaymentEntity>> getAllPayments();
     ResponseEntity<Object> createPayment(PaymentRequestModel requestModel);
+    Object newPayment(String id, Long total, String type);
     ResponseEntity<Object> updatePayment(Long id, PaymentRequestModel requestModel);
     ResponseEntity<Object> deletePayment(Long id);
 

@@ -68,6 +68,24 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     @Override
+    public Object newPayment(String id, Long total, String type) {
+        PaymentEntity savedPayment;
+        Optional<PaymentEntity> payment = paymentRepository.findById(Long.parseLong(id));
+        if (payment.isEmpty()){
+            savedPayment = PaymentEntity.builder()
+                .paymentType(type)
+                .total(total)
+                .build();
+        }
+        else {
+            payment.get().setPaymentType(type);
+            payment.get().setTotal(total);
+            savedPayment = paymentRepository.save(payment.get());
+        }
+        return paymentRepository.save(savedPayment);
+    }
+
+    @Override
     public ResponseEntity<Object> updatePayment(Long id, PaymentRequestModel requestModel) {
         Optional<PaymentEntity> payment = paymentRepository.findById(id);
         if (payment.isEmpty()){

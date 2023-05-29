@@ -1,25 +1,24 @@
 # Online Book Library Application
 
-This project demonstrates the implementation of security using Spring Boot and JSON Web Tokens (JWT).
+This project demonstrates the implementation of microservice using Spring Boot, Netflix Eureka Client and Feign Client.
 
 
 ## Features
 
-* User registration and login with JWT authentication
-* Password encryption using BCrypt
-* Role-based (CUSTOMER, ADMIN) authorization with Spring Security
-* Customized access denied handling
+* User registration.
+* See all books.
+* Book order with quantity.
+* Order payment.
 
 
 ## Technologies
 
 * Spring Boot
-* Spring Security
 * JPA
-* JSON Web Tokens (JWT)
-* BCrypt
 * Gradle
 * MySQL
+* Netflix Eureka
+* Feign Client
 
 
 ## Getting Started
@@ -36,51 +35,37 @@ To build and run the project, follow these steps:
 * Add database "project_db" to mySQL
 * Run the project
 
-The application will run at http://localhost:8096
+The application will run at http://localhost:9090
 
 
 
 ## Functions (Links and Mappings)
 
 
-**Permitted by all:**
+Post mapping (username, email and password) for registration: http://localhost:8096/user/register
 
-Post mapping (firstName, lastName, email and password) for registration: http://localhost:8096/user/register
-
-![img.png](Images/img.png)
-
-Post mapping (email and password) for login: http://localhost:8096/user/login
-
-![img_1.png](Images/img_1.png)
-
-<br>
-
-**Permitted by CUSTOMER and ADMIN roles:**
+![img.png](images/img.png)
 
 Get mapping to view all books: http://localhost:8096/books/all
 
-![img_2.png](Images/img_2.png)
+![img_2.png](images/img_2.png)
 
 Get mapping to view details of a book: http://localhost:8096/books/id/{id}
 
-![img_3.png](Images/img_3.png)
+![img_3.png](images/img_3.png)
 
 Get mapping to view all books by an author: http://localhost:8096/books/author/{author}
 
-![img_4.png](Images/img_4.png)
-
-<br>
-
-**Permitted by ADMIN roles:**
+![img_4.png](images/img_4.png)
 
 Post mapping (title, author, genre and price)  to create a book: http://localhost:8096/books/create
 
-![img_5.png](Images/img_5.png)
+![img_5.png](images/img_5.png)
 
 Patch mapping to update a book: http://localhost:8096/books/update/{id}
 
-![img_6.png](Images/img_6.png)
+![img_6.png](images/img_6.png)
 
 Delete mapping to delete a book: http://localhost:8096/books/delete/{id}
 
-![img_7.png](Images/img_7.png)
+![img_7.png](images/img_7.png)

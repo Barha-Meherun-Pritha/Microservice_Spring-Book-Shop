@@ -53,6 +53,20 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
+    public Long getPayment(Long payment) {
+        Iterable<OrderEntity> orders = orderRepository.findAll();
+        List<OrderEntity> b = new ArrayList<OrderEntity>();
+        long pay = 0L;
+        for(OrderEntity order:orders) {
+            if(order.getPayment().equals(payment)){
+                b.add(order);
+                pay = pay + (order.getPrice() * order.getQuantity());
+            }
+        }
+        return pay;
+    }
+
+    @Override
     public ResponseEntity<Iterable<OrderEntity>> getAllOrders() {
         Iterable<OrderEntity> orders = orderRepository.findAll();
         return new ResponseEntity<>(orders, HttpStatus.OK);
@@ -71,6 +85,20 @@ public class OrderServiceImpl implements OrderService {
         OrderEntity savedOrder = orderRepository.save(Order);
 
         return new ResponseEntity<>(savedOrder, HttpStatus.CREATED);
+    }
+
+    @Override
+    public Object newOrder(String payment, String id, String quantity, Long price) {
+        Long quant = Long.parseLong(quantity);
+        OrderEntity Order = OrderEntity.builder()
+                .payment(Long.parseLong(payment))
+                .book(Long.parseLong(id))
+                .price(price)
+                .quantity(quant)
+                .subTotal(price*quant)
+                .build();
+
+        return orderRepository.save(Order);
     }
 
     @Override

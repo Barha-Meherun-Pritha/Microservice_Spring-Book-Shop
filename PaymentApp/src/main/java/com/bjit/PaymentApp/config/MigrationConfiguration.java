@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 @Component
 @ConfigurationProperties("payment-app")
 public class MigrationConfiguration {
+
     private Boolean migration;
 
     public Boolean getMigration() {
@@ -15,4 +16,5 @@ public class MigrationConfiguration {
     public void setMigration(Boolean migration) {
         this.migration = migration;
     }
+
 }
