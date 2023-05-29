@@ -23,6 +23,9 @@ public class OrderController {
     @Autowired
     BookFeignClientsConfig bookFeignClientsConfig;
 
+    @Autowired
+    PaymentFeignClientsConfig paymentFeignClientsConfig;
+
     @GetMapping("price/{id}")
     public String price(@PathVariable String id){
         Long price = bookFeignClientsConfig.price(id);
@@ -51,24 +54,29 @@ public class OrderController {
 
     @GetMapping("inventory/{payment}-{id}-{quantity}")
     public String inventory(@PathVariable String payment, @PathVariable String id, @PathVariable String quantity){
-        String name = bookFeignClientsConfig.name(id);
-        if(Objects.equals(name, "No book found with this ID!")){
-            logger.info("No book found!");
-            return "No book found!";
+        String pay = paymentFeignClientsConfig.getPaymentById(payment);
+        if(!Objects.equals(pay, "Found")){
+            logger.info("No payment found!");
+            return "No payment found!";
         }
         else {
-            Long stock = bookFeignClientsConfig.inventory(id, quantity);
-            if(stock<Long.parseLong(quantity)) {
-                logger.info("Not enough book in the inventory!");
-                return "Not enough book in the inventory!";
-            }
-            else{
-                Long price = bookFeignClientsConfig.price(id);
-                long total = price * Long.parseLong(quantity);
-                Object order = orderService.newOrder(payment, id, quantity, price);
-                String msg = "Book Id: " + id + ", Name: " + name + ", Inventory: " + stock + ", Price: " + price + ", Quantity: " + quantity + ", Total: " + total;
-                logger.info(msg);
-                return msg;
+            String name = bookFeignClientsConfig.name(id);
+            if (Objects.equals(name, "No book found with this ID!")) {
+                logger.info("No book found!");
+                return "No book found!";
+            } else {
+                Long stock = bookFeignClientsConfig.inventory(id, quantity);
+                if (stock < Long.parseLong(quantity)) {
+                    logger.info("Not enough book in the inventory!");
+                    return "Not enough book in the inventory!";
+                } else {
+                    Long price = bookFeignClientsConfig.price(id);
+                    long total = price * Long.parseLong(quantity);
+                    Object order = orderService.newOrder(payment, id, quantity, price);
+                    String msg = "Book Id: " + id + ", Name: " + name + ", Inventory: " + stock + ", Price: " + price + ", Quantity: " + quantity + ", Total: " + total;
+                    logger.info(msg);
+                    return msg;
+                }
             }
         }
     }

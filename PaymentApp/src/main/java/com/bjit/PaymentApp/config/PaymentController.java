@@ -69,6 +69,19 @@ public class PaymentController {
         return paymentService.getPayment(Long.parseLong(PaymentId));
     }
 
+    @GetMapping("/get/{id}")
+    public String getPaymentById(@PathVariable String id) {
+        PaymentEntity payment = paymentService.getPaymentById(Long.parseLong(id));
+        if(payment==null){
+            logger.info("No payment found!");
+            return "No payment found!";
+        }
+        else {
+            logger.info("Found");
+            return "Found";
+        }
+    }
+
     @PostMapping("/create")
     public ResponseEntity<Object> newPayment(@RequestBody PaymentRequestModel Payment) {
         return paymentService.createPayment(Payment);
